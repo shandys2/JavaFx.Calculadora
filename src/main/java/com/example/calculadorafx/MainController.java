@@ -6,6 +6,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class MainController {
     @FXML
     private Button bc;
@@ -57,57 +61,98 @@ public class MainController {
 
     @FXML
     private Button b9;
-
     @FXML
     private Button bpor;
 
-
-    private int numero1;
-    private String coma=".";
-    StringBuilder n1= new StringBuilder("");
-    private double numero2;
-
-
+    private List<String> entrada1=null;
+    private List<String> entrada2=null;
+    Double operando1=0.0;
+    Double operando2=0.0;
+    String operacion="";
+    Boolean hayOperacion=false;
     @FXML
     protected void onNumeroClick(ActionEvent actionEvent) {
 
-        String txt=((Button)actionEvent.getSource()).getText();
-        //comprobamos que sea el caracter '.' y que no exista ya en el string
-        if(txt.equals(coma) && (n1.indexOf(coma)==-1)){
-            n1.append('.');
-            ((Button)actionEvent.getSource()).setDisable(true);
+        String txt;
+
+        if(entrada1==null && entrada2==null){
+            entrada1= new ArrayList<>();
+            entrada2= new ArrayList<>();
+        }
+        if (!hayOperacion){
+            txt=((Button)actionEvent.getSource()).getText();
+            entrada1.add(txt);
+            txtView.setText(String.join("",entrada1));
         }else{
-            n1.append(((Button)actionEvent.getSource()).getText());
-            txtView.setText(String.valueOf(n1));
+            txt=((Button)actionEvent.getSource()).getText();
+            entrada2.add(txt);
+            txtView.setText(String.join("",entrada2));
         }
     }
 
+    @FXML
+    protected void onPuntoClick(ActionEvent actionEvent) {
 
+        if (!hayOperacion){
+            entrada1.add(".");
+            txtView.setText(String.join("",entrada1));
+        }else{
+            entrada2.add(".");
+            txtView.setText(String.join("",entrada2));
+        }
+    }
     @FXML
     protected void onOperadorClick(ActionEvent actionEvent) {
-
-        String operacion=((Button)actionEvent.getSource()).getText();
-
-        switch (operacion) {
-
-            case "+":{ txtView.setText("sumando");}break;
-            case "-":{ txtView.setText("restando"); }break;
-            case "/":{ txtView.setText("dividiendo"); }break;
-            case "*":{  txtView.setText("multiplicando");}break;
-
+        String oper=((Button)actionEvent.getSource()).getText();
+        switch (oper) {
+            case "+":{ operacion="+";}break;
+            case "-":{ operacion="-"; }break;
+            case "/":{ operacion="/"; }break;
+            case "*":{ operacion="*";}break;
             }
+        hayOperacion=true;
         }
 
     @FXML
      protected void onResulClick() {
-        txtView.setText("Welcome to JavaFX Application!");
+        //parseamos las entradas
+        operando1= listToDouble(entrada1);
+        operando2= listToDouble(entrada2);
+        //hacemos y mostramos la operacion
+        Double respuesta = hacerOperacion(operando1,operando2);
+        txtView.setText(String.valueOf(respuesta));
+        //y reseteamos valores
+        entrada1=null;
+        entrada2=null;
+        hayOperacion=false;
     }
 
     @FXML
     protected void onLimpiarClick() {
         txtView.setText("");
-        numero1=0;
-        numero2=0;
+        entrada1=null;
+        entrada2=null;
+    }
+
+    protected Double listToDouble(List<String> entrada){
+
+        //Hacemos un join al array lo parseamos a Double
+        String aux = String.join("",entrada);
+        Double numero = Double.valueOf(aux);
+        return numero;
+
+    }
+
+    protected Double hacerOperacion(Double numero1, Double numero2){
+        Double resultado=0.0;
+        //Sin comentarios
+        switch (operacion){
+            case "*":return numero1 * numero2;
+            case "+":return numero1 + numero2;
+            case "-":return numero1 - numero2;
+            case "/":return numero1 / numero2;
+        }
+        return resultado;
     }
 
 
